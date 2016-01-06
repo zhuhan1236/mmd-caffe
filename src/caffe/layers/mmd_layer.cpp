@@ -21,8 +21,6 @@ void MMDLossLayer<Dtype>::LayerSetUp(
   beta_ = new Dtype[num_of_kernel_];
   caffe_set(num_of_kernel_, Dtype(1.0) / num_of_kernel_, beta_);
   now_iter_ = 0;
-  sum_of_epoch_ = new Dtype[num_of_kernel_];
-  caffe_set(num_of_kernel_, Dtype(0), sum_of_epoch_);
   gamma_ = Dtype(-1);
   Q_ = new Dtype* [num_of_kernel_];
   for(int i = 0; i < num_of_kernel_; i++){

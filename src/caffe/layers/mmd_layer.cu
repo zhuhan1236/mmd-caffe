@@ -13,6 +13,7 @@ typedef CGAL::MP_Float ET;
 #include "caffe/neuron_layers.hpp"
 #include "caffe/util/output_matrix.hpp"
 
+//CGAL config
 typedef CGAL::Quadratic_program_from_iterators
 <float **,float*,CGAL::Const_oneset_iterator<CGAL::Comparison_result>,
     bool*, float*,bool*,float*,float**,float*> Program;
@@ -24,6 +25,7 @@ template <typename Dtype>
 void MMDLossLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& top,
 const vector<Blob<Dtype>*>& bottom){
+    //nothing to do in forward
 }
 
 template <typename Dtype>
@@ -64,21 +66,14 @@ void MMDLossLayer<Dtype>::Backward_gpu(
         return;
     }
     now_iter_++;
-    Dtype sum;
-    caffe_gpu_asum(input_num_ * data_dim_, bottom[0]->gpu_diff(), &sum);
-    LOG(INFO) << "before mmd diff " << sum;
+    
+    //find source and target according to label
     perm_source_and_target<Dtype>(input_num_, source_index_, target_index_, 
             size_of_source_, size_of_target_, bottom[1]->cpu_data());
-    int sample_num;
     if (size_of_source_ <= 1 || size_of_target_ <= 1){
         return;
     }
-    if(size_of_source_ > size_of_target_){
-        sample_num = size_of_source_;
-    }
-    else{
-        sample_num = size_of_target_;
-    }
+    int sample_num = size_of_source_ > size_of_target_ ? size_of_source_ : size_of_target_;
     int s1,s2,t1,t2;
     srand((unsigned int)time(0));
     Dtype* bottom_data = bottom[0]->mutable_gpu_data();
@@ -103,8 +98,7 @@ void MMDLossLayer<Dtype>::Backward_gpu(
     } 
     else{
         gamma_ = (Dtype)input_num_ / bandwidth;
-    } 
-    LOG(INFO) << "bandwidth " << gamma_;
+    }
     Dtype loss = 0;
 
     Dtype* temp_loss1 = new Dtype[num_of_kernel_];
@@ -114,7 +108,7 @@ void MMDLossLayer<Dtype>::Backward_gpu(
 
     all_sample_num_ += sample_num;
     for(int i = 0; i < sample_num; i++){
-        //random get sample, insert code
+        //random get sample
         s1 = rand() % size_of_source_;
         s2 = rand() % size_of_source_;
         s2 = (s1 != s2) ? s2 : (s2 + 1) % size_of_source_;
@@ -127,7 +121,7 @@ void MMDLossLayer<Dtype>::Backward_gpu(
         s2 = source_index_[s2];
         t1 = target_index_[t1];
         t2 = target_index_[t2];
-        //////////////
+        //////////////////
         Dtype square_sum = 0;
         Dtype factor_for_diff = 0;
         const Dtype* x_s1 = bottom_data + s1 * data_dim_;
@@ -161,7 +155,6 @@ void MMDLossLayer<Dtype>::Backward_gpu(
 
             loss += temp_n;
             temp_n = (-2) * temp_gamma * temp_n;
-            sum_of_epoch_[j] += temp_n;
             factor_for_diff += temp_n;
             temp_gamma = temp_gamma * kernel_mul_;
         }
@@ -196,7 +189,6 @@ void MMDLossLayer<Dtype>::Backward_gpu(
 
             loss += temp_n;
             temp_n = (-2) * temp_gamma * temp_n;
-            sum_of_epoch_[j] += temp_n;
             factor_for_diff += temp_n;
             temp_gamma = temp_gamma * kernel_mul_;
         }
@@ -231,7 +223,6 @@ void MMDLossLayer<Dtype>::Backward_gpu(
             
             loss += temp_n;
             temp_n = (-2) * temp_gamma * temp_n;
-            sum_of_epoch_[j] += temp_n;
             factor_for_diff += temp_n;
             temp_gamma = temp_gamma * kernel_mul_;
         }
@@ -266,7 +257,6 @@ void MMDLossLayer<Dtype>::Backward_gpu(
 
             loss += temp_n;
             temp_n = (-2) * temp_gamma * temp_n;
-            sum_of_epoch_[j] += temp_n;
             factor_for_diff += temp_n;
             temp_gamma = temp_gamma * kernel_mul_;
         }
@@ -287,13 +277,13 @@ void MMDLossLayer<Dtype>::Backward_gpu(
     delete [] temp_loss2;
     delete [] temp_loss3;
     delete [] temp_loss4;
+    
+    //update beta_ in each epoch
     if(now_iter_ >= iter_of_epoch_){
         gamma_ = Dtype(-1);
         now_iter_ = 0;
         //update beta
-        //normalize Q and sum_of_epoch_
         caffe_scal(num_of_kernel_ * num_of_kernel_, Dtype(2) / all_sample_num_, Q_[0]);
-        caffe_scal(num_of_kernel_, Dtype(1) / all_sample_num_, sum_of_epoch_);
         
         for(int i = 0; i < num_of_kernel_; i++){
             for(int j = 0; j < num_of_kernel_; j++){
@@ -313,25 +303,25 @@ void MMDLossLayer<Dtype>::Backward_gpu(
             }
         }
 
-        //print_gpu_matrix(Q_[0], num_of_kernel_, num_of_kernel_, num_of_kernel_, num_of_kernel_);
-        //for(int i = 0; i < num_of_kernel_; i++){
-          //  LOG(INFO) << sum_of_pure_mmd_[i];
-        //}
-        bool temp_bool = true;
+        bool all_negative = true;
         for(int i = 0; i < num_of_kernel_; i++){
             if(sum_of_pure_mmd_[i] > 0){
-                temp_bool = false;
+                all_negative = false;
+                break;
             }
         }
         bool has_negative = false;
         for(int i = 0; i < num_of_kernel_; i++){
             if(sum_of_pure_mmd_[i] < 0){
                 has_negative = true;
+                break;
             }
         }
-        if(temp_bool){
+        if(all_negative){
             caffe_scal(num_of_kernel_ * num_of_kernel_, Dtype(-1), Q_[0]);
         }
+        
+        //choose beta_ update method
         switch(method_number_){
             case 0:
                 break;
@@ -349,13 +339,9 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                         top_sum += sorted_kernels[i].first;
                     }
                 }    
-                LOG(INFO) << "top_sum " << top_sum;
                 for(int i = 0;i < top_k_;++i){
-                    LOG(INFO) << "mmd " << sorted_kernels[i].first;
-                    LOG(INFO) << "id " << sorted_kernels[i].second;
                     if(sorted_kernels[i].first > 0){
                         beta_[sorted_kernels[i].second] = sorted_kernels[i].first / top_sum;
-                        LOG(INFO) << "beta " << beta_[sorted_kernels[i].second];
                     }
                 } 
                 break;
@@ -380,7 +366,7 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                     obj_first[i] = Dtype(0);
                 }
                 float b[1];
-                if(temp_bool){
+                if(all_negative){
                     b[0] = Dtype(-1);
                 }
                 else{
@@ -389,8 +375,6 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                 CGAL::Const_oneset_iterator<CGAL::Comparison_result> r(CGAL::EQUAL);
                 Program qp(num_of_kernel_, 1, equal_cons, b, r, lw_cons, lw_mul, up_cons, up_mul, (float**)Q_, obj_first, 0);
                 Solution s = CGAL::solve_quadratic_program(qp, ET());
-                LOG(INFO) << "before s";
-                LOG(INFO) << s;
                 int j = 0;
                 if(!has_negative){
                     for(CGAL::Quadratic_program_solution<ET>::Variable_value_iterator
@@ -409,11 +393,8 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                         }
                     }
                     for(int i = 0;i < top_k_;++i){
-                        LOG(INFO) << "mmd " << sorted_betas[i].first;
-                        LOG(INFO) << "id " << sorted_betas[i].second;
                         if(sorted_betas[i].first > 0){
                             beta_[sorted_betas[i].second] = sorted_betas[i].first / top_sum;
-                            LOG(INFO) << "beta " << beta_[sorted_betas[i].second];
                         }
                     } 
                 }
@@ -437,34 +418,20 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                         top_sum += sorted_kernels[i].first;
                     }
                 }    
-                LOG(INFO) << "top_sum " << top_sum;
                 for(int i = 0;i < top_k_;++i){
-                    LOG(INFO) << "mmd " << sorted_kernels[i].first;
-                    LOG(INFO) << "id " << sorted_kernels[i].second;
                     if(sorted_kernels[i].first > 0){
                         beta_[sorted_kernels[i].second] = sorted_kernels[i].first / top_sum;
-                        LOG(INFO) << "beta " << beta_[sorted_kernels[i].second];
                     }
                 } 
                 break;
             }
         }
-        //use Q and sum_of_epoch_ to solve convex problem 
+        //use Q and sum_of_pure_mmd_ to solve convex problem 
         caffe_set(num_of_kernel_ * num_of_kernel_, Dtype(0), Q_[0]);
         caffe_set(num_of_kernel_, Dtype(0), variance_);
         all_sample_num_ = 0;
         caffe_set(num_of_kernel_, Dtype(0), sum_of_pure_mmd_);
     }
-
-    /*LOG(INFO) << num_of_kernel_;*/
-    /*for(int i = 0; i < num_of_kernel_; i++){*/
-        /*LOG(INFO) << "kernel" << i << ": " << sum_of_epoch_[i];*/
-    /*}*/
-    caffe_set(num_of_kernel_, Dtype(0), sum_of_epoch_);
-
-    caffe_gpu_asum(input_num_ * data_dim_, bottom[0]->gpu_diff(), &sum);
-    LOG(INFO) << "after mmd diff sum " << sum;
-    LOG(INFO) << "------";
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(MMDLossLayer);

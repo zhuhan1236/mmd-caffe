@@ -775,7 +775,6 @@ class MMDLossLayer : public NeuronLayer<Dtype> {
   int now_iter_;
   bool fix_gamma_;
   Dtype** Q_;
-  Dtype* sum_of_epoch_;
   Dtype* variance_;
   Dtype I_lambda_;
   int all_sample_num_;

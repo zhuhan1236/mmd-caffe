@@ -2541,7 +2541,7 @@ layer {
     mmd_lambda: 0.1
     iter_of_epoch: 44
     method_param {
-      top_num: 0
+      top_num: 5
       i_lambda: 0.0
     }
     method: "none"
