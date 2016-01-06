@@ -2,7 +2,6 @@ net: "models/google_net/amazon_to_webcam/train_val.prototxt"
 test_iter: 25
 test_interval: 500
 test_initialization: false
-test_initialization: false
 display: 20
 average_loss: 40
 base_lr: 0.001
