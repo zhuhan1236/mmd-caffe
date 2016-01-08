@@ -19,7 +19,6 @@ Parameter Tuning
 ---------------
 In `models/google_net/amazon_to_webcam/proto_parse.py`, we write a python script to help tune the network parameters. An inception is ragarded as a unit and it's parameters are tune together.
 
-
+Dependency
 ---------------
-
-sdf
+We use [CGAL](http://www.cgal.org) to solve Quadratic Programming problem when updating `beta`. Please install it before compiling this code. We add CGAL as LIBRARIES in `Makefile`. However, if you prefer to compile caffe with `cmake`, maybe you should config CGAL yourself.
