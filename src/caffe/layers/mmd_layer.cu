@@ -333,8 +333,6 @@ void MMDLossLayer<Dtype>::Backward_gpu(
             caffe_scal(num_of_kernel_ * num_of_kernel_, Dtype(-1), Q_[0]);
         }
         switch(method_number_){
-            case 0:
-                break;
             case 1: 
             { 
                 if(has_negative){
@@ -360,8 +358,6 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                 } 
                 break;
             }
-            case 2:
-                break;
             case 4:
             {
                 float *equal_cons[num_of_kernel_];
@@ -448,6 +444,8 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                 } 
                 break;
             }
+            default:
+                break;
         }
         //use Q and sum_of_epoch_ to solve convex problem 
         caffe_set(num_of_kernel_ * num_of_kernel_, Dtype(0), Q_[0]);

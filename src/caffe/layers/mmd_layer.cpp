@@ -42,10 +42,6 @@ void MMDLossLayer<Dtype>::LayerSetUp(
   else if(this->layer_param_.mmd_param().method() == "none"){
         method_number_ = 0;
   }
-  else if(this->layer_param_.mmd_param().method() == "qp"){
-        method_number_ = 2;
-        I_lambda_ = this->layer_param_.mmd_param().method_param().i_lambda();
-  }
   else if(this->layer_param_.mmd_param().method() == "L2"){
         method_number_ = 4;
         top_k_ = this->layer_param_.mmd_param().method_param().top_num();
