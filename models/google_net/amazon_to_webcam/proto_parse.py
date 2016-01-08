@@ -13,7 +13,7 @@ inceptions = {
     'inception_4a': [[0, 0], [0, 0]],
     'inception_4b': [[0, 0], [0, 0]],
     'inception_4c': [[0, 0], [0, 0]],
-    'inception_4d': [[0.1, 0.2], [1, 0]],
+    'inception_4d': [[0.0, 0.0], [1, 0]],
     'inception_4e': [[0.1, 0.2], [1, 0]],
     'inception_5a': [[0.1, 0.2], [1, 0]],
     'inception_5b': [[0.1, 0.2], [1, 0]],
@@ -30,14 +30,14 @@ losses = {
 }
 # entropy for entropy layer
 entropy = {
-    'entropy_loss': [0.2, 800],
+    'entropy_loss': [4, 1500],
 }
 # mmd_lambda for 4 mmd layers
 mmds = {
-    'mmd3/4d': 0.04,
-    'mmd3/4e': 0.08,
-    'mmd3/5a': 0.1,
-    'mmd3/loss3': 0.1,
+    'mmd3/4d': 0,
+    'mmd3/4e': 3,
+    'mmd3/5a': 1,
+    'mmd3/loss3': 0.3,
 }
 iter_of_epoch = {
     'mmd3/4d': 44,

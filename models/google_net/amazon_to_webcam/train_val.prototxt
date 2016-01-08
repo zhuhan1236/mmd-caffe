@@ -39,7 +39,7 @@ layer {
   }
   image_data_param {
     source: "data/office/amazon_to_webcam/test.txt"
-    batch_size: 32
+    batch_size: 53
     shuffle: true
     new_height: 256
     new_width: 256
@@ -1422,11 +1422,11 @@ layer {
   bottom: "inception_4c/output"
   top: "inception_4d/1x1"
   param {
-    lr_mult: 0.1
+    lr_mult: 0.0
     decay_mult: 1
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.0
     decay_mult: 0
   }
   convolution_param {
@@ -1454,11 +1454,11 @@ layer {
   bottom: "inception_4c/output"
   top: "inception_4d/3x3_reduce"
   param {
-    lr_mult: 0.1
+    lr_mult: 0.0
     decay_mult: 1
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.0
     decay_mult: 0
   }
   convolution_param {
@@ -1486,11 +1486,11 @@ layer {
   bottom: "inception_4d/3x3_reduce"
   top: "inception_4d/3x3"
   param {
-    lr_mult: 0.1
+    lr_mult: 0.0
     decay_mult: 1
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.0
     decay_mult: 0
   }
   convolution_param {
@@ -1519,11 +1519,11 @@ layer {
   bottom: "inception_4c/output"
   top: "inception_4d/5x5_reduce"
   param {
-    lr_mult: 0.1
+    lr_mult: 0.0
     decay_mult: 1
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.0
     decay_mult: 0
   }
   convolution_param {
@@ -1551,11 +1551,11 @@ layer {
   bottom: "inception_4d/5x5_reduce"
   top: "inception_4d/5x5"
   param {
-    lr_mult: 0.1
+    lr_mult: 0.0
     decay_mult: 1
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.0
     decay_mult: 0
   }
   convolution_param {
@@ -1596,11 +1596,11 @@ layer {
   bottom: "inception_4d/pool"
   top: "inception_4d/pool_proj"
   param {
-    lr_mult: 0.1
+    lr_mult: 0.0
     decay_mult: 1
   }
   param {
-    lr_mult: 0.2
+    lr_mult: 0.0
     decay_mult: 0
   }
   convolution_param {
@@ -1639,7 +1639,7 @@ layer {
   top: "inception_4d/output"
   mmd_param {
     num_of_kernel: 5
-    mmd_lambda: 0.04
+    mmd_lambda: 0
     iter_of_epoch: 44
     method_param {
       top_num: 5
@@ -2026,7 +2026,7 @@ layer {
   top: "pool4/3x3_s2"
   mmd_param {
     num_of_kernel: 5
-    mmd_lambda: 0.08
+    mmd_lambda: 3
     iter_of_epoch: 44
     method_param {
       top_num: 5
@@ -2260,7 +2260,7 @@ layer {
   top: "inception_5a/output"
   mmd_param {
     num_of_kernel: 5
-    mmd_lambda: 0.1
+    mmd_lambda: 1
     iter_of_epoch: 44
     method_param {
       top_num: 5
@@ -2538,7 +2538,7 @@ layer {
   top: "loss3/classifier_office"
   mmd_param {
     num_of_kernel: 5
-    mmd_lambda: 0.1
+    mmd_lambda: 0.3
     iter_of_epoch: 44
     method_param {
       top_num: 5
@@ -2561,11 +2561,11 @@ layer {
   bottom: "softmax_label"
   bottom: "label"
   top: "entropy_loss"
-  loss_weight: 0.2
+  loss_weight: 4
   entropy_param {
     threshold: 0.001
     ignore_label: 999
-    iterations_num: 800
+    iterations_num: 1500
   }
 }
 layer {
