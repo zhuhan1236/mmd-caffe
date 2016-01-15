@@ -1,34 +1,30 @@
-# Caffe
+# mmd-caffe
 
-Caffe is a deep learning framework made with expression, speed, and modularity in mind.
-It is developed by the Berkeley Vision and Learning Center ([BVLC](http://bvlc.eecs.berkeley.edu)) and community contributors.
+This is the implementation of PAMI paper "Learning Transferable Visual Features with Very Deep Adaptation Networks". We fork the repository with version ID `c6414ea` from [Caffe](https://github.com/BVLC/caffe) and make our modifications. The main modifications are listed as follow:
 
-Check out the [project site](http://caffe.berkeleyvision.org) for all the details like
+- Change the label from a single integer to a tuple, which contains the origin label and an indicator to distinguish source and target
+- Add mmd layer described in the paper to neuron layers
+- Add entropy loss layer described in the paper to loss layers
 
-- [DIY Deep Learning for Vision with Caffe](https://docs.google.com/presentation/d/1UeKXVgRvvxg9OUdh_UiC5G71UMscNPlvArsWER41PsU/edit#slide=id.p)
-- [Tutorial Documentation](http://caffe.berkeleyvision.org/tutorial/)
-- [BVLC reference models](http://caffe.berkeleyvision.org/model_zoo.html) and the [community model zoo](https://github.com/BVLC/caffe/wiki/Model-Zoo)
-- [Installation instructions](http://caffe.berkeleyvision.org/installation.html)
+Training Model
+---------------
 
-and step-by-step examples.
+In `models/google_net/amazon_to_webcam`, we give an example model based on GoogLeNet. In this model, we insert mmd layers  after inception 4d, 4e, 5a and the last fully connect layer individually. In addition, an entropy loss layer is linked after the last fully connect layer.
 
-[![Join the chat at https://gitter.im/BVLC/caffe](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/BVLC/caffe?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+The `bvlc_googlenet` is used as the pre-trained model.
 
-Please join the [caffe-users group](https://groups.google.com/forum/#!forum/caffe-users) or [gitter chat](https://gitter.im/BVLC/caffe) to ask questions and talk about methods and models.
-Framework development discussions and thorough bug reports are collected on [Issues](https://github.com/BVLC/caffe/issues).
+Data Preparation
+---------------
+In `data/office/amazon_to_webcam/*.txt`, we give an example to show how to prepare the train and test data file. In this task, `amazon` dataset is the source domain and `webcam` dataset is the target domain. For training data in source domain, it's label looks like `(-1, origin_label)`. For training data in target domain, it's label looks like `(origin_label, -1)`. For testing data, it's label looks like `(origin_label, -1)`. Integer `-1` is used to distinguish source and target during training and testing, and `origin_label` is the acutal label of the image.
 
-Happy brewing!
+For semi-supervised tasks, the label of labeled target data looks like `(I, origin_label)`. `I` is any positive integer (larger than the number of classes) and should be added to `ignore_label` of entropy loss layer.
 
-## License and Citation
+Parameter Tuning
+---------------
+In `models/google_net/amazon_to_webcam/proto_parse.py`, we write a python script to help tune the network parameters. An inception is ragarded as a unit and it's parameters are tuned together.
 
-Caffe is released under the [BSD 2-Clause license](https://github.com/BVLC/caffe/blob/master/LICENSE).
-The BVLC reference models are released for unrestricted use.
+Besides, parameter `iter_of_epoch` should be set to tell mmd layer when to update data. Practically, `iter_of_epoch = (source_num + target_num) / batch_size`.
 
-Please cite Caffe in your publications if it helps your research:
-
-    @article{jia2014caffe,
-      Author = {Jia, Yangqing and Shelhamer, Evan and Donahue, Jeff and Karayev, Sergey and Long, Jonathan and Girshick, Ross and Guadarrama, Sergio and Darrell, Trevor},
-      Journal = {arXiv preprint arXiv:1408.5093},
-      Title = {Caffe: Convolutional Architecture for Fast Feature Embedding},
-      Year = {2014}
-    }
+Dependency
+---------------
+We use [CGAL](http://www.cgal.org) to solve Quadratic Programming problem when updating `beta`. Please install it before compiling this code. We add CGAL as LIBRARIES in `Makefile`. However, if you prefer to compile caffe with `cmake`, maybe you should config CGAL yourself.
