@@ -6,11 +6,11 @@ display: 20
 average_loss: 40
 base_lr: 0.001
 lr_policy: "step"
-stepsize: 600
+stepsize: 1000
 gamma: 0.5
-max_iter: 10000
+max_iter: 12000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 200000
-snapshot_prefix: "models/google_net/amazon_to_webcam/model_0.3_1_3_ent_4"
+snapshot_prefix: "models/google_net/amazon_to_webcam/model"
 solver_mode: GPU
