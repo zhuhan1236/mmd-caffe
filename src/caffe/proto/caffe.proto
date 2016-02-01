@@ -333,7 +333,6 @@ message LayerParameter {
   optional ThresholdParameter threshold_param = 128;
   optional WindowDataParameter window_data_param = 129;
   optional MMDParameter mmd_param = 132;
-  optional EntropyParameter entropy_param = 133;
 }
 
 // Message that stores parameters used to apply transformation
@@ -738,13 +737,6 @@ message MMDParameter {
 message MMDMethodParameter{
     optional uint32 top_num = 1[default = 1];
     optional float i_lambda = 2[default = 0.0001];
-}
-
-// Message that stores parameters used by Entropy layer
-message EntropyParameter {
-    optional float threshold = 1 [default = 0.001];
-    optional uint32 ignore_label = 2[default = 999];
-    optional uint32 iterations_num = 3[default = 0];
 }
 
 // Message that stores parameters used by TanHLayer
