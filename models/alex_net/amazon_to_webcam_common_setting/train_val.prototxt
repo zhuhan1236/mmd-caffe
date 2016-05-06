@@ -5,11 +5,11 @@ layer {
   top: "data"
   top: "label"
   image_data_param {
-    source: "data/office/amazon_to_webcam_common_setting/train.txt"
+    source: "/home/caffe/origin-mmd-caffe/data/office/amazon_to_webcam/train.txt"
     batch_size: 64
     new_height: 256
     new_width: 256
-    shuffle: True
+    shuffle: true
   }
   transform_param {
     crop_size: 227
@@ -26,11 +26,11 @@ layer {
   top: "data"
   top: "label"
   image_data_param {
-    source: "data/office/amazon_to_webcam_common_setting/test.txt"
+    source: "/home/caffe/origin-mmd-caffe/data/office/amazon_to_webcam/test.txt"
     batch_size: 53
     new_height: 256
     new_width: 256
-    shuffle: True
+    shuffle: true
   }
   transform_param {
     crop_size: 227
@@ -421,11 +421,11 @@ layer {
   bottom: "softmax_label"
   bottom: "label"
   top: "entropy_loss"
-  loss_weight: 1
+  loss_weight: 10
   entropy_param {
     threshold: 0.001
     ignore_label: 999
-    iterations_num: 600
+    iterations_num: 60000
   }
 }
 layer {

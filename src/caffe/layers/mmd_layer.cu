@@ -66,7 +66,7 @@ void MMDLossLayer<Dtype>::Backward_gpu(
     now_iter_++;
     Dtype sum;
     caffe_gpu_asum(input_num_ * data_dim_, bottom[0]->gpu_diff(), &sum);
-    LOG(INFO) << "before mmd diff " << sum;
+    //LOG(INFO) << "before mmd diff " << sum;
     perm_source_and_target<Dtype>(input_num_, source_index_, target_index_, 
             size_of_source_, size_of_target_, bottom[1]->cpu_data());
     int sample_num;
@@ -104,7 +104,7 @@ void MMDLossLayer<Dtype>::Backward_gpu(
     else{
         gamma_ = (Dtype)input_num_ / bandwidth;
     } 
-    LOG(INFO) << "bandwidth " << gamma_;
+    //LOG(INFO) << "bandwidth " << gamma_;
     Dtype loss = 0;
 
     Dtype* temp_loss1 = new Dtype[num_of_kernel_];
@@ -347,13 +347,13 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                         top_sum += sorted_kernels[i].first;
                     }
                 }    
-                LOG(INFO) << "top_sum " << top_sum;
+                //LOG(INFO) << "top_sum " << top_sum;
                 for(int i = 0;i < top_k_;++i){
-                    LOG(INFO) << "mmd " << sorted_kernels[i].first;
-                    LOG(INFO) << "id " << sorted_kernels[i].second;
+                    //LOG(INFO) << "mmd " << sorted_kernels[i].first;
+                    //LOG(INFO) << "id " << sorted_kernels[i].second;
                     if(sorted_kernels[i].first > 0){
                         beta_[sorted_kernels[i].second] = sorted_kernels[i].first / top_sum;
-                        LOG(INFO) << "beta " << beta_[sorted_kernels[i].second];
+                        //LOG(INFO) << "beta " << beta_[sorted_kernels[i].second];
                     }
                 } 
                 break;
@@ -385,8 +385,8 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                 CGAL::Const_oneset_iterator<CGAL::Comparison_result> r(CGAL::EQUAL);
                 Program qp(num_of_kernel_, 1, equal_cons, b, r, lw_cons, lw_mul, up_cons, up_mul, (float**)Q_, obj_first, 0);
                 Solution s = CGAL::solve_quadratic_program(qp, ET());
-                LOG(INFO) << "before s";
-                LOG(INFO) << s;
+                //LOG(INFO) << "before s";
+                //LOG(INFO) << s;
                 int j = 0;
                 if(!has_negative){
                     for(CGAL::Quadratic_program_solution<ET>::Variable_value_iterator
@@ -405,16 +405,16 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                         }
                     }
                     for(int i = 0;i < top_k_;++i){
-                        LOG(INFO) << "mmd " << sorted_betas[i].first;
-                        LOG(INFO) << "id " << sorted_betas[i].second;
+                        //LOG(INFO) << "mmd " << sorted_betas[i].first;
+                        //LOG(INFO) << "id " << sorted_betas[i].second;
                         if(sorted_betas[i].first > 0){
                             beta_[sorted_betas[i].second] = sorted_betas[i].first / top_sum;
-                            LOG(INFO) << "beta " << beta_[sorted_betas[i].second];
+                            //LOG(INFO) << "beta " << beta_[sorted_betas[i].second];
                         }
                     } 
                 }
                 else{
-                    LOG(INFO) << "has negative value, do not change beta";
+                    //LOG(INFO) << "has negative value, do not change beta";
                 }
                 break;
             }
@@ -433,13 +433,13 @@ void MMDLossLayer<Dtype>::Backward_gpu(
                         top_sum += sorted_kernels[i].first;
                     }
                 }    
-                LOG(INFO) << "top_sum " << top_sum;
+                //LOG(INFO) << "top_sum " << top_sum;
                 for(int i = 0;i < top_k_;++i){
-                    LOG(INFO) << "mmd " << sorted_kernels[i].first;
-                    LOG(INFO) << "id " << sorted_kernels[i].second;
+                    //LOG(INFO) << "mmd " << sorted_kernels[i].first;
+                    //LOG(INFO) << "id " << sorted_kernels[i].second;
                     if(sorted_kernels[i].first > 0){
                         beta_[sorted_kernels[i].second] = sorted_kernels[i].first / top_sum;
-                        LOG(INFO) << "beta " << beta_[sorted_kernels[i].second];
+                        //LOG(INFO) << "beta " << beta_[sorted_kernels[i].second];
                     }
                 } 
                 break;
@@ -461,8 +461,8 @@ void MMDLossLayer<Dtype>::Backward_gpu(
     caffe_set(num_of_kernel_, Dtype(0), sum_of_epoch_);
 
     caffe_gpu_asum(input_num_ * data_dim_, bottom[0]->gpu_diff(), &sum);
-    LOG(INFO) << "after mmd diff sum " << sum;
-    LOG(INFO) << "------";
+    //LOG(INFO) << "after mmd diff sum " << sum;
+    //LOG(INFO) << "------";
 }
 
 INSTANTIATE_LAYER_GPU_FUNCS(MMDLossLayer);
