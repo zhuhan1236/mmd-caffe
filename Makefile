@@ -163,8 +163,7 @@ ifneq ($(CPU_ONLY), 1)
 endif
 LIBRARIES += glog gflags protobuf leveldb snappy \
 	lmdb boost_system hdf5_hl hdf5 m \
-	opencv_core opencv_highgui opencv_imgproc \
-	CGAL
+	opencv_core opencv_highgui opencv_imgproc
 PYTHON_LIBRARIES := boost_python python2.7
 WARNINGS := -Wall -Wno-sign-compare
 
