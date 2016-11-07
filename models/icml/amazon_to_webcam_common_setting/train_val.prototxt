@@ -9,7 +9,7 @@ layer {
     batch_size: 64
     new_height: 256
     new_width: 256
-    shuffle: True
+    shuffle: true
   }
   transform_param {
     crop_size: 227
@@ -30,7 +30,7 @@ layer {
     batch_size: 53
     new_height: 256
     new_width: 256
-    shuffle: True
+    shuffle: true
   }
   transform_param {
     crop_size: 227
