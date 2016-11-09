@@ -1,3 +1,6 @@
+# DEPRECATED
+This repository is deprecated, please move to [transfer-caffe](https://github.com/zhuhan1236/transfer-caffe)
+
 # mmd-caffe
 
 This is the implementation of PAMI paper "Learning Transferable Visual Features with Very Deep Adaptation Networks". We fork the repository with version ID `c6414ea` from [Caffe](https://github.com/BVLC/caffe) and make our modifications. The main modifications are listed as follow:
