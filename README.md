@@ -1,5 +1,5 @@
 # DEPRECATED
-This repository is deprecated, please move to [transfer-caffe](https://github.com/zhuhan1236/transfer-caffe)
+This repository is deprecated, please move to [transfer-caffe](https://github.com/thuml/transfer-caffe)
 
 # mmd-caffe
 
